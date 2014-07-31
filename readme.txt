@@ -1,10 +1,10 @@
-=== Task Scheduler (beta) ===
+=== Task Scheduler ===
 Contributors: Michael Uno, miunosoft
 Donate link: http://en.michaeluno.jp/donate
-Tags: access, tool, background, backend, server, admin, task, management, system, event, scheduler,
+Tags: access, tool, background, backend, server, admin, task, management, system, event, scheduler, bulk, action, email, delete, post
 Requires at least: 3.7
 Tested up to: 3.9.1
-Stable tag: 1.0.0
+Stable tag: 1.0.0b03
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Provides a task management system.
@@ -64,5 +64,10 @@ Please use the [GitHub repository](https://github.com/michaeluno/Task-Scheduler)
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.0.0b03 - 2014/07/31 =
+- Changed it to display module description in the form field.
+- Fixed an issue that the `Change` button did not appear when the `Debug` action is selected.
+- Optimized the server heartbeat functionality.
+
+= 1.0.0b02 - 2014/07/31 =
 - Initial release.

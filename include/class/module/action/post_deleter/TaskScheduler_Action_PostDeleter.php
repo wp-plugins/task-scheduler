@@ -36,6 +36,13 @@ class TaskScheduler_Action_PostDeleter extends TaskScheduler_Action_Base {
 	}
 
 	/**
+	 * Returns the description of the module.
+	 */
+	public function getDescription( $sDescription ) {
+		return __( 'Deletes posts by post type, taxonomy, and taxonomy terms.', 'task-scheduler' );
+	}	
+	
+	/**
 	 * Defines the behavior of the task action.
 	 * 
 	 * Required arguments: 
@@ -61,8 +68,6 @@ class TaskScheduler_Action_PostDeleter extends TaskScheduler_Action_Base {
 			return 0;	// failed
 		}
 		
-TaskScheduler_Debug::log( 'Called the action of: ' . $oRoutine->ID  . ' title is: ' . $oRoutine->post_title );
-
 		if ( $oRoutine->hasThreads() ) {
 			$oRoutine->log( 'There is a thread already.' );
 			return 0;
@@ -86,12 +91,6 @@ TaskScheduler_Debug::log( 'Called the action of: ' . $oRoutine->ID  . ' title is
 				'term_ids_of_deleting_posts'		=>	isset( $_aRoutineArguments['term_ids_of_deleting_posts'] ) ? $_aRoutineArguments['term_ids_of_deleting_posts'] : null,
 			)			
 		);
-
-TaskScheduler_Debug::log( 'Created a thread: ' . $_iThreadTaskID );
-// TaskScheduler_Debug::log( get_the_terms(  $_iThreadTaskID, TaskScheduler_Registry::Taxonomy_SystemLabel  ) );
-// TaskScheduler_Debug::log( 'post type exists: ' . post_type_exists( TaskScheduler_Registry::PostType_Task ) );
-// TaskScheduler_Debug::log( 'taxonomy type exists: ' . taxonomy_exists( TaskScheduler_Registry::Taxonomy_SystemLabel ) );
-TaskScheduler_Debug::log( 'thread exists: ' . TaskScheduler_TaskUtility::hasThreads( $oRoutine->ID ) );
 
 		// Check actions in the background.
 		if ( $_iThreadTaskID ) {			

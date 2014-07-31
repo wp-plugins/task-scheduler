@@ -23,10 +23,15 @@ class TaskScheduler_Occurrence_FixedInterval extends TaskScheduler_Occurrence_Ba
 	 * Returns the label for the slug.
 	 */
 	public function getLabel( $sSlug ) {
-		
 		return __( 'Fixed Interval', 'task-scheduler' );
-		
 	}		
+	
+	/**
+	 * Returns the description of the module.
+	 */
+	public function getDescription( $sDescription ) {
+		return __( 'Triggers actions at the set interval.', 'task-scheduler' );
+	}	
 	
 	/**
 	 * Do something when the task finishes.
@@ -47,7 +52,6 @@ class TaskScheduler_Occurrence_FixedInterval extends TaskScheduler_Occurrence_Ba
 			? $oTask->_last_run_time
 			: microtime( true );
 		$_iInterval = $this->_getIntervalInSeconds( $_aOptions['interval'][ 0 ], $_aOptions['interval'][ 1 ] );
-TaskScheduler_Debug::log( 'next scheduled:' . TaskScheduler_WPUtility::getSiteReadableDate( $_nLastRunTime + $_iInterval, 'Y/m/d G:i:s', true ) );
 		return $_nLastRunTime + $_iInterval;
 				
 	}

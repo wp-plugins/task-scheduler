@@ -28,23 +28,23 @@ class TaskScheduler_Occurrence_Volatile extends TaskScheduler_Occurrence_Base {
 	public function getLabel( $sSlug ) {
 		return __( 'Volatile', 'task-scheduler' );
 	}			
+
+	/**
+	 * Returns the description of the module.
+	 */
+	public function getDescription( $sDescription ) {
+		return __( 'Triggers actions only once, used mostly by threads.', 'task-scheduler' );
+	}		
 	
 	/**
 	 * Deletes stored tasks.
 	 */
 	public function doAfterAction( $oRoutine, $sExitCode ) {
 
-TaskScheduler_Debug::log( 'exit code' );
-TaskScheduler_Debug::log( $sExitCode );
-		// 
-		if ( 'NOT_DELETE' === $sExitCode ) { 
-TaskScheduler_Debug::log( 'returning' );		
+		if ( 'NOT_DELETE' === $sExitCode ) { 	
 			return; 
-		}
-		
+		}	
 		$vRet = $oRoutine->delete();
-// TaskScheduler_Debug::log( 'is deleted' );
-// TaskScheduler_Debug::log( $vRet );
 		
 	}	
 	

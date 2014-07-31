@@ -91,11 +91,6 @@ class TaskScheduler_Event_ServerHeartbeat_Loader {
 		// Unlock the action
 		delete_transient( $_sActionLockKey );
 		do_action( "task_scheduler_action_after_doing_routine", $oRoutine );	// for the Volatile occurrence type
-TaskScheduler_Debug::log( 
-	'exiting the method. exit code:' . $oRoutine->_exit_code 
-		. ' type: ' . ( $oRoutine->isThread() ? 'Thread' : 'Task' )
-		. ' id: ' . $oRoutine->ID 
-);
 		
 	}
 	
@@ -104,9 +99,9 @@ TaskScheduler_Debug::log(
 		 * 
 		 * @return	float	The required sleep duration in seconds.
 		 */
-		private function _getRequiredSleepSeconds( $iNextRunTimeStamp ) {
+		private function _getRequiredSleepSeconds( $nNextRunTimeStamp ) {
 			
-			$_nSleepSeconds = $iNextRunTimeStamp - microtime( true );
+			$_nSleepSeconds = ( $nNextRunTimeStamp - microtime( true ) ) + 0;	// plus zero will convert the value to numeric.
 			$_nSleepSeconds = $_nSleepSeconds <= 0 ? 0 : $_nSleepSeconds;			
 			return $_nSleepSeconds;
 			
@@ -159,7 +154,6 @@ TaskScheduler_Debug::log(
 			if ( $nSleepSeconds <= 0 ) { return; }
 			$_iSleepDurationMicroSeconds = ceil( $nSleepSeconds ) * 1000000;
 			if ( $_iSleepDurationMicroSeconds > 0 ) {
-TaskScheduler_Debug::log( 'waiting: ' . $nSleepSeconds );
 				usleep( $_iSleepDurationMicroSeconds ); 
 			}
 			

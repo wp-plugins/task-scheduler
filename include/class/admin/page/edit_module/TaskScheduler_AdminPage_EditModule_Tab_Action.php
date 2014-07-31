@@ -43,9 +43,9 @@ abstract class TaskScheduler_AdminPage_EditModule_Tab_Action extends TaskSchedul
 			array(
 				'field_id'			=>	'routine_action',
 				'title'				=>	__( 'Action', 'task-scheduler' ),
-				'type'				=>	'select',
+				'type'				=>	'revealer',
 				'label'				=>	array(),	// will be redefined in the 'field_definition_{...}' callback.
-				'description'		=>	__( 'Select the one to perform when the time comes', 'task-scheduler' ),
+				// 'description'		=>	__( 'Select the one to perform when the time comes', 'task-scheduler' ),
 			),
 			array(
 				'field_id'			=>	'custom_action',
@@ -83,6 +83,8 @@ abstract class TaskScheduler_AdminPage_EditModule_Tab_Action extends TaskSchedul
 	 * If the saved action slug is not listed in the label array, it forces to select -1 to let it set a custom action slug.
 	 */	 
 	public function field_definition_TaskScheduler_AdminPage_EditModule_edit_action_routine_action( $aField ) {
+		
+		return $this->_getRoutineActionField( $aField );
 		
 		$_sRoutineActionSlug	= $this->_getWizardOptions( 'routine_action' );
 		$aField['label']		= apply_filters( 
@@ -138,7 +140,6 @@ abstract class TaskScheduler_AdminPage_EditModule_Tab_Action extends TaskSchedul
 			unset( $aInput['custom_action'] );	// remove one of these and leave the other.
 			
 		}				
-TaskScheduler_Debug::log( $aInput );
 		
 		if ( ! $_bIsValid ) {
 
@@ -153,6 +154,9 @@ TaskScheduler_Debug::log( $aInput );
 		// Drop the 'custom_action' key and unity the values into the 'routine_action' key.
 		$aInput['routine_action'] = '-1' !== ( string ) $aInput['routine_action'] ? $aInput['routine_action'] : $aInput['custom_action'];
 
+		// Remove the prefix of the selector of the action slug.
+		$aInput['routine_action'] = preg_replace( '/^#description-/', '', $aInput['routine_action'] );		
+		
 		// Modify the wizard options.
 		$_aWizardOptions = $aInput;			
 		$_aWizardOptions['action_label'] = apply_filters( "task_scheduler_filter_label_action_" . $aInput['routine_action'], $aInput['routine_action'] );
@@ -190,7 +194,5 @@ TaskScheduler_Debug::log( $aInput );
 			return $_sRedirectURL;			
 			
 		}
-	
-	
 
 }
