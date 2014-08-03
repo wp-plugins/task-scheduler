@@ -4,7 +4,7 @@ Donate link: http://en.michaeluno.jp/donate
 Tags: access, tool, background, backend, server, admin, task, management, system, event, scheduler, bulk, action, email, delete, post, cron, automation
 Requires at least: 3.7
 Tested up to: 3.9.1
-Stable tag: 1.0.0b05
+Stable tag: 1.0.0b04
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Provides a task management system.
@@ -51,14 +51,6 @@ If you need a custom module, let us know it!
 
 = Why Do I need this? =
 This is mostly for site admins who need total control over the server behavior. If you use WordPress just to publish articles, you won't need this.
-
-= Is it possible to trigger actions while disabling the server heartbeat? =
-Yes. In that case, you need to set up your own Cron job that accesses the site with the `task_scheduler_checking_actions` query string in the request url.
-
-e.g.
-`/usr/local/bin/curl --silent http://your-site/?task_scheduler_checking_actions=1`
-
-`/usr/local/bin/wget http://your-site/?task_scheduler_checking_actions=1`
 
 = Found a bug. Where can I report? =
 Please use the [GitHub repository](https://github.com/michaeluno/Task-Scheduler) of this plugin.
