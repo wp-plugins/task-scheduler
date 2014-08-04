@@ -268,7 +268,10 @@ final class TaskScheduler_ServerHeartbeat {
 		 * Checks the heart beat.
 		 */
 		static public function _replyToCheck() {
+			
+			if ( ! self::getInterval() ) { return; }
 			self::run();
+			
 		}		
 		
 		/**
@@ -371,9 +374,9 @@ final class TaskScheduler_ServerHeartbeat {
 			// Ensures it is done only once in a page load.
 			static $_bIsCalled;
 			if ( $_bIsCalled ) { return; }
-			$_bIsCalled = true;	
-					
-			// For a safety net
+			$_bIsCalled = true;		
+			
+			// For a safety net - check if the option is enabled.
 			self::_scheduleToCheckBeat();
 						
 			// Load the page in the background
@@ -386,6 +389,7 @@ final class TaskScheduler_ServerHeartbeat {
 		 */
 		static private function _scheduleToCheckBeat() {
 			
+			if ( self::$_bStop ) { return; }			
 			if ( wp_next_scheduled( self::$sServerHeartbeatActionHook ) ) { return; }
 			wp_schedule_single_event( time() + self::getInterval() + 1, self::$sServerHeartbeatActionHook );
 			
