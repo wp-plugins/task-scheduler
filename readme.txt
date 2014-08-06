@@ -4,7 +4,7 @@ Donate link: http://en.michaeluno.jp/donate
 Tags: access, tool, background, backend, server, admin, task, management, system, event, scheduler, bulk, action, email, delete, post, cron, automation
 Requires at least: 3.7
 Tested up to: 3.9.1
-Stable tag: 1.0.0b04
+Stable tag: 1.0.0b07
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Provides a task management system.
@@ -72,7 +72,16 @@ Please use the [GitHub repository](https://github.com/michaeluno/Task-Scheduler)
 
 == Changelog ==
 
-= 1.0.0b06 - 2014/08/03 =
+= 1.0.0b07 - 2014/08/06 =
+- Added a new meta box in task edition page that includes the `Update` submit button, some time indications, and the switch option of `Enabled` or `Disabled`.
+- Tweaked the mechanism of checking routines.
+- Tweaked the Delete Posts action module not to insert a taxonomy query argument when the taxonomy slug is not selected.
+- Fixed a bug that repeatable fields could not be properly updated in wizards.
+- Fixed a bug that editing a disable task made the task not accessible from the task listing table.
+- Fixed a bug that the same task could be triggered when simultaneous page loads that checks the scheduled actions are made at the exact the same time.
+- Fixed a bug that the same task could be wedged in the queue of spawning tasks while another page load is spawning tasks.
+
+= 1.0.0b06 - 2014/08/05 =
 - Fixed a bug that the server heartbeat got resumed upon plugin activation even when it is disabled.
 - Added a description in the setting page that appears when the server heartbeat is disabled.
 

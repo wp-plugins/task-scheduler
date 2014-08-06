@@ -13,10 +13,17 @@
   * 
   */
 class TaskScheduler_Event_ServerHeartbeat_Checker {
+	
+	/**
+	 * The check-action transient key.
+	 */
+	static public $sCheckActionTransientKey		= 'TS_checking_actions';
+	static public $sRecheckActionTransientKey	= 'TS_rechecking_actions';
 		
 	public function __construct() {
 
 		add_action( 'task_scheduler_action_spawn_routine', array( $this, '_replyToSpawnRoutine' ), 10, 2 );
+		add_action( 'task_scheduler_action_check_shceduled_actions', array( $this, '_replyToCheckScheduledActions' ) );
 		
 		// If doing actions, return.
 		if ( isset( $_COOKIE[ 'server_heartbeat_action' ] ) ) {
@@ -28,17 +35,25 @@ class TaskScheduler_Event_ServerHeartbeat_Checker {
 			return;
 		}
 		
-		// If this is a server-heartbeat background page load and 
+		// If this is not a server-heartbeat background page load or a page load to check scheduled actions manually
 		if ( 
-			TaskScheduler_ServerHeartbeat::isBackground() 
-			|| $this->_isManualPageLoad()
+			! ( TaskScheduler_ServerHeartbeat::isBackground() 
+			|| $this->_isManualPageLoad() )
 		) {
-
-			// Letting the site load and wait till the 'wp_loaded' hook is required to load the custom taxonomy that the plugin uses.
-			add_action( 'wp_loaded', array( $this, '_replyToSpawnRoutines' ), 1 );	// set the high priority because the sleep sub-routine also hooks the same action.
 			return;
-			
 		}
+		
+		// Check a check-action lock - this prevents that while checking and spawning routines, another page load do the same and triggers the same tasks at the same time.
+		if ( TaskScheduler_WPUtility::getTransientWithoutCache( self::$sCheckActionTransientKey ) ) {
+			return;
+		}
+		
+		// At this point, the page load deserves spawning routines.		
+		// Letting the site load and wait till the 'wp_loaded' hook is required to load the custom taxonomy that the plugin uses.
+		add_action( 'wp_loaded', array( $this, '_replyToSpawnRoutines' ), 1 );	// set the high priority because the sleep sub-routine also hooks the same action.
+		return;
+		
+	
 		
 	}	
 	
@@ -73,7 +88,12 @@ class TaskScheduler_Event_ServerHeartbeat_Checker {
 		$_iProcessingCount				= TaskScheduler_RoutineUtility::getProcessingCount();
 		$_iAllowedNumberOfRoutines		= $_iMaxAllowedNumberOfRoutines - $_iProcessingCount;
 		$_aScheduledRoutines			= array_slice( $_aScheduledRoutines, 0, $_iAllowedNumberOfRoutines );
+		$_nNow							= microtime( true );
 
+		// Set a check-action lock 
+		delete_transient( self::$sRecheckActionTransientKey );
+		set_transient( self::$sCheckActionTransientKey, $_nNow, 60 );
+		
 		foreach ( $_aScheduledRoutines as $_iRoutineID ) {		
 		
 			$_oTask = TaskScheduler_Routine::getInstance( $_iRoutineID );
@@ -85,23 +105,33 @@ class TaskScheduler_Event_ServerHeartbeat_Checker {
 				$_oTask->delete();	
 				continue;				
 			}
-			
+
 			do_action( 'task_scheduler_action_spawn_routine', $_iRoutineID );
 			
 		}
 		
+		delete_transient( self::$sCheckActionTransientKey );
+		
+		// If the transient value is different from the set one right before the loop, it means that another process has requested a check.
+		if ( TaskScheduler_WPUtility::getTransientWithoutCache( self::$sRecheckActionTransientKey ) ) {
+			delete_transient( self::$sRecheckActionTransientKey );
+			TaskScheduler_ServerHeartbeat::beat();
+		}		
+		
 	}
-	
-	
+		
 	/**
 	 * Spawns the given routine.
 	 * 
 	 * @param	integer	$iRoutineID		The routine ID
-	 * @param	numeric	$nScheduledTime	The scheduled run time. This is also used to determine whether the call is made manually or automatically.
+	 * @param	numeric	$nScheduledTime	The scheduled run time. This is also used to determine whether the call is made manually or automatically. 
+	 * If the server heartbeat is running and pulsates, it does not the scheduled time but if the user presses the 'Run Now' link in the task listing table,
+	 * it sets the scheduled time.
 	 */
 	public function _replyToSpawnRoutine( $iRoutineID, $nScheduledTime=null ) {
-
-		do_action( 'task_scheduler_action_before_calling_routine', TaskScheduler_Routine::getInstance( $iRoutineID ) );
+		
+		$_nCurrentMicrotime = microtime( true );
+		do_action( 'task_scheduler_action_before_calling_routine', TaskScheduler_Routine::getInstance( $iRoutineID ), $_nCurrentMicrotime );
 		
 		$_aDebugInfo = defined( 'WP_DEBUG' ) && WP_DEBUG
 			? array( 'spawning_routine' => $iRoutineID )
@@ -113,6 +143,7 @@ class TaskScheduler_Event_ServerHeartbeat_Checker {
 				'server_heartbeat_id'				=>	'',	// do not set the id so that the server heartbeat does not think it is a background call.
 				'server_heartbeat_action'			=>	$iRoutineID,
 				'server_heartbeat_scheduled_time'	=>	$nScheduledTime,
+				'server_heartbeat_spawned_time'		=>	$_nCurrentMicrotime,
 			),
 			'spawn_routine'
 		);		
@@ -121,5 +152,21 @@ class TaskScheduler_Event_ServerHeartbeat_Checker {
 		// This is because the action will be called in the next page load and it is not called yet.
 	
 	}	
+
+	/**
+	 * Checks scheduled actions in a background page load.
+	 * 
+	 * If there are scheduled ones and reach the scheduled time, they will be spawned.
+	 * 
+	 */
+	public function _replyToCheckScheduledActions() {
+		
+		if ( get_transient( self::$sCheckActionTransientKey ) ) {
+			set_transient( self::$sRecheckActionTransientKey, microtime( true ), 60 );
+			return;
+		}
+		TaskScheduler_ServerHeartbeat::beat();
+		
+	}
 	
 }
