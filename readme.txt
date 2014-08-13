@@ -4,7 +4,7 @@ Donate link: http://en.michaeluno.jp/donate
 Tags: access, tool, background, backend, server, admin, task, management, system, event, scheduler, bulk, action, email, delete, post, cron, automation
 Requires at least: 3.7
 Tested up to: 3.9.1
-Stable tag: 1.0.0b08
+Stable tag: 1.0.0b09
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Provides a task management system.
@@ -91,7 +91,13 @@ Please use the [GitHub repository](https://github.com/michaeluno/Task-Scheduler)
 
 == Changelog ==
 
-= 1.0.0b08 =
+= 1.0.0b09 - 2014/08/09 =
+- Changed the method of including PHP files to keep maintainability.
+- Tweaked the performance of plugin admin pages.
+- Fixed a bug that a page created for debugging was remaining.
+- Fixed a bug that module options were not displayed in the task editing page.
+
+= 1.0.0b08 - 2014/08/09 =
 - Added the `Check Action Now` button in the task listing table page.
 - Added the `Number of Posts to Process per Routine` option to the `Delete Posts` action module.
 - Tweaked the method of including PHP files to improve performance. 

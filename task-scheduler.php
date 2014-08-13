@@ -5,16 +5,8 @@
 	Description:	Provides an enhanced task management system for WordPress.
 	Author:			miunosoft (Michael Uno)
 	Author URI:		http://michaeluno.jp
-	Version:		1.0.0b08
+	Version:		1.0.0b09
 */
-
-/* 
- * Script Procedure  
- * 1. Define the base registry class.
- * 2. Define the registry class.
- * 3. Include files.
- * 4. Perform the bootstrap script.
- */
 
 /* 1. Define the base registry class. */
 /**
@@ -24,7 +16,7 @@
  */
 class TaskScheduler_Registry_Base {
 
-	const Version		= '1.0.0b08';
+	const Version		= '1.0.0b09';	// <--- DON'T FORGET TO CHANGE THIS AS WELL!!
 	const Name			= 'Task Scheduler';
 	const Description	= 'Provides an enhanced task management system for WordPress.';
 	const URI			= 'http://en.michaeluno.jp/';
@@ -63,7 +55,6 @@ final class TaskScheduler_Registry extends TaskScheduler_Registry_Base {
 	// These properties will be defined in the setUp() method.
 	static public $sFilePath	= '';
 	static public $sDirPath		= '';
-	static public $sFileURI		= '';
 	
 	/**
 	 * Sets up static properties.
@@ -72,7 +63,6 @@ final class TaskScheduler_Registry extends TaskScheduler_Registry_Base {
 						
 		self::$sFilePath	= $sPluginFilePath ? $sPluginFilePath : __FILE__;
 		self::$sDirPath		= dirname( self::$sFilePath );
-		self::$sFileURI		= plugins_url( '', self::$sFilePath );
 		
 	}	
 	
@@ -91,36 +81,6 @@ final class TaskScheduler_Registry extends TaskScheduler_Registry_Base {
 if ( ! defined( 'ABSPATH' ) ) { return; }
 TaskScheduler_Registry::setUp( __FILE__ );
 
-/* 3. Include files. */
-
-// $_nNow = microtime( true );
-
-// If the debug mode is on, include individual files; otherwise, include the minified file as it reduces the speed more than x2.
-if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-	
-	include( dirname( __FILE__ ) . '/include/task-scheduler-include-class-files.php' );
-	if ( is_admin() ) {	
-		include( dirname( __FILE__ ) . '/include/task-scheduler-include-class-files-admin.php' );
-	}
-	
-} else {
-	
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/task-scheduler-admin-page-framework.min.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/autocomplete-custom-field-type/TaskScheduler_AutoCompleteCustomFieldType.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/date-time-custom-field-types/TaskScheduler_DateRangeCustomFieldType.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/date-time-custom-field-types/TaskScheduler_DateTimeCustomFieldType.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/date-time-custom-field-types/TaskScheduler_DateTimeRangeCustomFieldType.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/date-time-custom-field-types/TaskScheduler_DateCustomFieldType.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/date-time-custom-field-types/TaskScheduler_TimeCustomFieldType.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/date-time-custom-field-types/TaskScheduler_TimeRangeCustomFieldType.php' );
-	include( TaskScheduler_Registry::$sDirPath . '/include/library/admin-page-framework/revealer-custom-field-type/TaskScheduler_RevealerCustomFieldType.php' );
-	
-	// Include the minified script
-	include( dirname( __FILE__ ) . '/include/task-scheduler-classes.min.php' );
-	
-}
-
-// TaskScheduler_Debug::log( ( microtime( true ) - $_nNow  )  );
-
 /* 4. Perform the bootstrap. */
+include( dirname( __FILE__ ) . '/include/class/boot/TaskScheduler_Bootstrap.php' );	
 new TaskScheduler_Bootstrap( __FILE__ );

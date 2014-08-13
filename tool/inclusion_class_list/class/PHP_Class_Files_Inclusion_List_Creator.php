@@ -1,16 +1,19 @@
 <?php
 /**
- * PHP Class Files Inclusion Script Creator
+ * PHP Class Files Inclusion List Creator
  * 
- * @author				Michael Uno <michael@michaeluno.jp>
- * @copyright			2013-2014 (c) Michael Uno
- * @license				MIT	<http://opensource.org/licenses/MIT>
+ * @author		Michael Uno <michael@michaeluno.jp>
+ * @copyright	2013-2014 (c) Michael Uno
+ * @license		MIT	<http://opensource.org/licenses/MIT>
  */
  
 /**
- * Creates a PHP script that includes files that are in a specified directory.
+ * Creates a PHP file that defines an array holding file path with the class key.
+ * 
+ * This is meant to be used for the callback function for the spl_autoload_register() function.
  *  
- * @remark	The parsed class file must have a name of the class defined in the file.
+ * @remark		The parsed class file must have a name of the class defined in the file.
+ * @version		1.0.1
  */
 class PHP_Class_Files_Inclusion_Script_Creator extends PHP_Class_Files_Script_Creator_Base {
 	
@@ -21,8 +24,8 @@ class PHP_Class_Files_Inclusion_Script_Creator extends PHP_Class_Files_Script_Cr
 		'output_buffer'			=>	true,
 		'header_type'			=>	'DOCBLOCK',	
 		'exclude_classes'		=>	array(),
-		'include_function'		=>	'include',		// require, require_once, include_once
 		'base_dir_var'			=>	'',
+		'output_var_name'		=>	'$aClassFiles',
 		
 		// Search options
 		'search'	=>	array(
@@ -44,7 +47,6 @@ class PHP_Class_Files_Inclusion_Script_Creator extends PHP_Class_Files_Script_Cr
 	 *  - 'output_buffer'		: boolean	whether or not output buffer should be printed.
 	 *  - 'header_type'			: string	whether or not to use the docBlock of the header class; otherwise, it will parse the constants of the class. 
 	 *  - 'exclude_classes' 	: array		an array holding class names to exclude.
-	 *  - 'include_function'	: string	the function name without parentheses to include the path such as require, require_once, include. Default: include.
 	 *  - 'base_dir_var'		: string	the variable or constant name that is prefixed before the inclusion path.
 	 *  - 'search'				: array		the arguments for the directory search options.
 	 * 	The accepted values are 'CONSTANTS' or 'DOCBLOCK'.
@@ -111,7 +113,7 @@ class PHP_Class_Files_Inclusion_Script_Creator extends PHP_Class_Files_Script_Cr
 		}				
 		
 		/* Write to a file */
-		$this->write( $_aFiles, $sBaseDirPath, $sOutputFilePath, $_sHeaderComment, $aOptions['include_function'], $aOptions['base_dir_var'] );
+		$this->write( $_aFiles, $sBaseDirPath, $sOutputFilePath, $_sHeaderComment, $aOptions['output_var_name'], $aOptions['base_dir_var'] );
 		
 	}
 							
@@ -122,96 +124,45 @@ class PHP_Class_Files_Inclusion_Script_Creator extends PHP_Class_Files_Script_Cr
 				unset( $aFiles[ $_sClassName ] );
 			}
 		}
-		return $this->_resolveDependent( array(), $aFiles );
+		
+		$aFiles = $this->_extractDefinedClasses( $aFiles );
+		
+		return $aFiles;
 	
 	}
-		
-		private function _resolveDependent( array $aNewFileContainer, array $aFiles ) {
-					
-			$_iNotMoved	= 0;
-			foreach( $aFiles as $_sClassName => $_aFile ) {
-				
-				$_sParentClassName	= $_aFile['dependency'];
-				$_aDefinedClasses	= $_aFile['defined_classes'];
-				
-				// If no dependency, just move.
-				if ( ! $_sParentClassName ) {
-					$aNewFileContainer[ $_sClassName ] = $_aFile;
-					unset( $aFiles[ $_sClassName ] );
-					continue;
-				}
-				
-				// At this point, there is a dependency.
-				
-				// If it is stored in the moving array, go on.
-				if ( isset( $aNewFileContainer[ $_sParentClassName ] ) ) {
-					$aNewFileContainer[ $_sClassName ] = $_aFile;
-					unset( $aFiles[ $_sClassName ] );
-					continue;				
-				}
-				
-				// If the parent class is already defined inside the moved files, go on.
-				if ( $this->_isClassDefined( $_sParentClassName, $aNewFileContainer ) ) {
-					$aNewFileContainer[ $_sClassName ] = $_aFile;
-					unset( $aFiles[ $_sClassName ] );
-					continue;					
-				}
-				
-				// If the parent class is defined inside the remaining files (the ones not moved yet), do not move yet.
-				$_aFilesCopy		= $aFiles;
-				unset( $_aFilesCopy[ $_sClassName ] );
-				if ( $this->_isClassDefined( $_sParentClassName, $_aFilesCopy ) ) {
-					$_iNotMoved++;
-					continue;					
-				}
-				
-				// It can be an external component. In that case, it is not stored in the parsing array.
-				if ( ! isset( $aFiles[ $_sParentClassName ] ) ) {					
-					$aNewFileContainer[ $_sClassName ] = $_aFile;
-					unset( $aFiles[ $_sClassName ] );					
-					continue;
-				}
-				
-				// Okay, here the parent class is not stored yet. So do not move.
-				$_iNotMoved++;
-				
-			}
-		
-			if ( $_iNotMoved ) {
-				$aNewFileContainer = array_merge( $this->_resolveDependent( $aNewFileContainer, $aFiles ), $aNewFileContainer );
-			}
+		private function _extractDefinedClasses( array $aFiles ) {
 			
-			return $aNewFileContainer;
+			$_aAdditionalClasses = array();
+			foreach( $aFiles as $_sClassName => $_aFile ) {
+				foreach( $_aFile['defined_classes'] as $_sAdditionalClass ) {
+					if ( isset( $aFiles[ $_sAdditionalClass ] ) ) { continue; }
+					$_aAdditionalClasses[ $_sAdditionalClass ] = $_aFile;
+				}
+			}
+			return $aFiles + $_aAdditionalClasses;
 			
 		}
-			/**
-			 * Checks if the given class name is defined in the given files array.
-			 */
-			private function _isClassDefined( $sSubjectClassName, $aFiles ) {
-				
-				foreach( $aFiles as $_sClassName => $_aFile ) {
-					if ( in_array( $sSubjectClassName, $_aFile['defined_classes'] ) ) {
-						return true;
-					}
-				}
-				return false;
-				
-			}
 			
-	public function write( array $aFiles, $sBaseDirPath, $sOutputFilePath, $sHeadingComment, $sIncludeFunc, $sBaseDirVar ) {
+	public function write( array $aFiles, $sBaseDirPath, $sOutputFilePath, $sHeadingComment, $sOutputArrayVar, $sBaseDirVar ) {
 			
-		$_aData = array();
+		$_aData		= array();
 		
 		// Create a heading.
-		$_aData[] = mb_convert_encoding( '<?php ' . PHP_EOL . $sHeadingComment, 'UTF-8', 'auto' );
+		$_aData[]	= mb_convert_encoding( '<?php ' . PHP_EOL . $sHeadingComment, 'UTF-8', 'auto' );
 		
-		// Insert the data
-		foreach( $aFiles as $_aFile ) {					
-			$_sPath		= str_replace('\\', '/', $_aFile['path'] );
+		// Start array declaration
+		$_aData[]	= $sOutputArrayVar . ' = array( ' . PHP_EOL;
 			
+		// Insert the data
+		foreach( $aFiles as $_sClassName => $_aFile ) {					
+			$_sPath		= str_replace('\\', '/', $_aFile['path'] );
 			$_sPath		= $this->_getRelativePath( $sBaseDirPath, $_sPath );
-			$_aData[]	= "{$sIncludeFunc}( " . $sBaseDirVar . " . '" . $_sPath . "' );" . PHP_EOL;
+			$_aData[]	= "\t" . '"' . $_sClassName . '"' . "\t" . '=>' 
+				. "\t" . $sBaseDirVar . ' . "' . $_sPath . '", ' . PHP_EOL;
 		}
+		
+		// Close the array declaration
+		$_aData[]	= ');' . PHP_EOL;
 		
 		// Remove the existing file.
 		if ( file_exists( $sOutputFilePath ) ) {
@@ -257,7 +208,9 @@ class PHP_Class_Files_Inclusion_Script_Creator extends PHP_Class_Files_Script_Cr
 					}
 				}
 			}
-			return ltrim( implode( '/', $relPath ), '.' );
+			
+			$relPath = implode( '/', $relPath );
+			return ltrim( $relPath, '.' );
 		}	
 
 }
