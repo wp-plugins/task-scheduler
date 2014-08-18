@@ -88,7 +88,6 @@ Please use the [GitHub repository](https://github.com/michaeluno/Task-Scheduler)
 2. ***Wizard***
 3. ***Settings***
 
-
 == Changelog ==
 
 = 1.0.0b10 - 2014/08/18 =
