@@ -3,7 +3,7 @@ Contributors: Michael Uno, miunosoft
 Donate link: http://en.michaeluno.jp/donate
 Tags: access, tool, background, backend, server, admin, task, management, system, event, scheduler, bulk, action, email, delete, post, cron, automation
 Requires at least: 3.7
-Tested up to: 3.9.1
+Tested up to: 3.9.2
 Stable tag: 1.0.0b10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -21,7 +21,7 @@ The goal of this plugin is to resolve such issues and become the perfect solutio
 
 <h4>What it does</h4>
 - creates periodic background access to the site (optional). 
-- triggers tasks registered by the site owner at desired time.
+- triggers tasks registered by the site owner at desired time or interval.
 
 <h4>Built-in Actions</h4>
 - <strong>Delete Posts</strong> - Performs bulk deletion of posts based on the post type, post statuses, taxonomy, and taxonomy terms.
@@ -88,7 +88,11 @@ Please use the [GitHub repository](https://github.com/michaeluno/Task-Scheduler)
 2. ***Wizard***
 3. ***Settings***
 
+
 == Changelog ==
+
+= 1.0.0b11 =
+- Added the ability for the `autocomplete` admin page framework custom field to search users that can be used by modules.
 
 = 1.0.0b10 - 2014/08/18 =
 - Deprecated the Hung Routine Handler action module.
