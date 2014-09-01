@@ -4,7 +4,7 @@ Donate link: http://en.michaeluno.jp/donate
 Tags: access, tool, utility, background, backend, server, admin, task, management, system, event, scheduler, bulk, action, email, delete, post, cron, automation, routine, routines
 Requires at least: 3.7
 Tested up to: 3.9.2
-Stable tag: 1.0.0b12
+Stable tag: 1.0.0b13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Provides a task management system.
@@ -90,7 +90,7 @@ Please use the [GitHub repository](https://github.com/michaeluno/Task-Scheduler)
 
 == Changelog ==
 
-= 1.0.0b13 =
+= 1.0.0b13 - 2014/09/01 =
 - Fixed an issue with sites enabling object caching.
 - Fixed a bug of paged navigation links in the task listing table.
 
