@@ -18,27 +18,27 @@ class TaskScheduler_MetaBox_Action extends TaskScheduler_MetaBox_Base {
 
         $_sModuleEditPageURL = TaskScheduler_PluginUtility::getModuleEditPageURL(
             array(
-                'transient_key'    =>    TaskScheduler_Registry::TransientPrefix . uniqid(),
-                'tab'            =>    'edit_action',
-                'post'            =>    isset( $_GET['post'] ) ? $_GET['post'] : 0,
+                'transient_key'  => TaskScheduler_Registry::TRANSIENT_PREFIX . uniqid(),
+                'tab'            => 'edit_action',
+                'post'           => isset( $_GET['post'] ) ? $_GET['post'] : 0,
             )
         );
             
         $this->addSettingFields(
             array(
-                'field_id'        =>    'routine_action',
-                'title'            =>    __( 'Action', 'task-scheduler' ),
-                'type'            =>    'text',
-                'attributes'    =>    array(
-                    'ReadOnly'    =>    'ReadOnly',
-                    'name'        =>    '',    // not saving the data
+                'field_id'        => 'routine_action',
+                'title'           => __( 'Action', 'task-scheduler' ),
+                'type'            => 'text',
+                'attributes'      => array(
+                    'ReadOnly'    => 'ReadOnly',
+                    'name'        => '',    // not saving the data
                 ),
             ),
             array(
-                'field_id'        =>    'argument',
-                'title'            =>    __( 'Arguments', 'task-scheduler' ),
-                'type'            =>    'text',
-                'repeatable'    =>    true,
+                'field_id'        => 'argument',
+                'title'           => __( 'Arguments', 'task-scheduler' ),
+                'type'            => 'text',
+                'repeatable'      => true,
             ),
             array()
         );    
@@ -61,24 +61,51 @@ class TaskScheduler_MetaBox_Action extends TaskScheduler_MetaBox_Base {
      */
     public function field_definition_TaskScheduler_MetaBox_Action( $aAllFields ) {    // field_definition_{class name}
 
-        if ( ! $this->_oTask ) { return $aAllFields; }
-        if ( ! isset( $aAllFields['_default'] ) || ! is_array( $aAllFields['_default'] ) ) { return $aAllFields; }
+        if ( ! $this->_oTask ) { 
+            return $aAllFields; 
+        }
+        if ( ! isset( $aAllFields['_default'] ) || ! is_array( $aAllFields['_default'] ) ) { 
+            return $aAllFields; 
+        }
         
         $aAllFields['_default'] = $aAllFields['_default'] 
             + $this->_getModuleFields( $this->_oTask->routine_action, ( array ) $this->_oTask->{$this->_oTask->routine_action} )
-            + array( 'wizard_redirect_button_action' => $this->_getModuleEditButtonField( 'wizard_redirect_button_action', 'edit_action' ) );
+        ;
         
         return $aAllFields;
         
     }
     
-    /*
-     * Validation methods
+    /**
+     * * A validation callback.
+     * 
+     * @callback    filter      validation_ + extended class name
      */
-    public function validation_TaskScheduler_MetaBox_Action( $aInput, $aOldInput ) {    // validation_ + extended class name
+    public function validation_TaskScheduler_MetaBox_Action( /* $aInput, $aOldInput, $oAdminPage, $aSubmitInfo */ ) {    
+                    
+        $_aParams    = func_get_args() + array(
+            null, null, null, null
+        );
+        $aInput      = $_aParams[ 0 ];
+        $aOldInput   = $_aParams[ 1 ];
+        $oAdminPage  = $_aParams[ 2 ];
+        $aSubmitInfo = $_aParams[ 3 ];                      
                     
         return $aInput;
         
     }
-    
+ 
+    public function content( $sOutput ) {
+        $sOutput = isset( $this->_oTask->routine_action )
+            ? apply_filters(
+                'task_scheduler_admin_filter_meta_box_content_' . $this->_oTask->routine_action,
+                $sOutput,
+                $this->_oTask
+            )
+            : $sOutput;
+        return $sOutput 
+             . $this->_getChangeButton( 'edit_action' )
+        ;            
+    }
+ 
 }

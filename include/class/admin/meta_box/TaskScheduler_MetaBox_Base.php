@@ -6,6 +6,11 @@
  */
 abstract class TaskScheduler_MetaBox_Base extends TaskScheduler_AdminPageFramework_MetaBox {
 // abstract class TaskScheduler_MetaBox_Base extends AdminPageFramework_MetaBox {
+    
+    /**
+     * Stores the task objecct.
+     */
+    protected $_oTask;
         
     public function start() {
         
@@ -18,16 +23,23 @@ abstract class TaskScheduler_MetaBox_Base extends TaskScheduler_AdminPageFramewo
             
     public function _replyToRegisterFieldTypes( $oScreen ) {
         
-        if ( ! in_array( $oScreen->post_type, array( TaskScheduler_Registry::PostType_Task, TaskScheduler_Registry::PostType_Thread ) ) ) { 
+        if ( 
+            ! in_array( 
+                $oScreen->post_type, 
+                array( 
+                    TaskScheduler_Registry::$aPostTypes[ 'task' ], 
+                    TaskScheduler_Registry::$aPostTypes[ 'thread' ] 
+                ) 
+            ) 
+        ) { 
             return; 
         }    
         
         // Register custom field types
         $_sClassName = get_class( $this );
-        new TaskScheduler_DateTimeCustomFieldType( $_sClassName );        
-        new TaskScheduler_TimeCustomFieldType( $_sClassName );        
-        new TaskScheduler_DateCustomFieldType( $_sClassName );                    
-        
+        new TaskScheduler_DateTimeCustomFieldType( $_sClassName );
+        new TaskScheduler_TimeCustomFieldType( $_sClassName );     
+        new TaskScheduler_DateCustomFieldType( $_sClassName );        
         
     }
             
@@ -35,20 +47,26 @@ abstract class TaskScheduler_MetaBox_Base extends TaskScheduler_AdminPageFramewo
         
         global $post;
 
-        if ( ! in_array( $sHook, array( 'post.php', 'post-new.php' ) ) ) { return; }        
-        if ( ! in_array( $post->post_type, array( TaskScheduler_Registry::PostType_Task, TaskScheduler_Registry::PostType_Thread ) ) ) { return; }
+        if ( ! in_array( $sHook, array( 'post.php', 'post-new.php' ) ) ) { 
+            return; 
+        }        
+        if ( ! in_array( $post->post_type, array( TaskScheduler_Registry::$aPostTypes[ 'task' ], TaskScheduler_Registry::$aPostTypes[ 'thread' ] ) ) ) { 
+            return; 
+        }
         
-        wp_enqueue_style( 'task_scheduler_meta_box_css', TaskScheduler_Registry::getPluginURL( 'asset/css/meta_box.css' ) );
+        wp_enqueue_style( 
+            'task_scheduler_meta_box_css', 
+            TaskScheduler_Registry::getPluginURL( 'asset/css/meta_box.css' ) 
+        );
         
     }
-    
     
     /**
      * Returns fields of a particular module.
      * 
      * This is used to display the stored values of module options.
      * 
-     * @param    string    $sModuleSlug        The key name that holds the module options such as 'fixed_interval', 'send_email' that are used as the module slug.
+     * @param    string   $sModuleSlug        The key name that holds the module options such as 'fixed_interval', 'send_email' that are used as the module slug.
      * @param    array    $aModularOptions    An array holding the stored modular options.
      */
     protected function _getModuleFields( $sModuleSlug, array $aModularOptions ) {
@@ -58,17 +76,19 @@ abstract class TaskScheduler_MetaBox_Base extends TaskScheduler_AdminPageFramewo
             return $_aFields; 
         }
         
-        $_aModularFields            = array();
-        $_aWizardSlugs                = apply_filters( "task_scheduler_admin_filter_wizard_slugs_{$sModuleSlug}", array() );
+        $_aModularFields = array();
+        $_aWizardSlugs   = apply_filters( "task_scheduler_admin_filter_wizard_slugs_{$sModuleSlug}", array() );
         foreach( $_aWizardSlugs as $sSlug ) {
             $_aWizardFieldsWithSection    = apply_filters( "task_scheduler_filter_fields_{$sSlug}", array() );
-            $_aWizardFields                = isset( $_aWizardFieldsWithSection[ $sSlug ] ) ? $_aWizardFieldsWithSection[ $sSlug ] : array();
-            $_aModularFields            = $_aModularFields + $_aWizardFields;
+            $_aWizardFields               = isset( $_aWizardFieldsWithSection[ $sSlug ] ) ? $_aWizardFieldsWithSection[ $sSlug ] : array();
+            $_aModularFields              = $_aModularFields + $_aWizardFields;
         }
         foreach( $aModularOptions as $_sKey => $_aisValue ) {
             
             // Check if the parsing option key exists in the fields array.
-            if ( ! isset( $_aModularFields[ $_sKey ] ) ) { continue; }
+            if ( ! isset( $_aModularFields[ $_sKey ] ) ) { 
+                continue; 
+            }
             $_aModularField = $_aModularFields[ $_sKey ];
             
             $_aisValue = TaskScheduler_Utility::isJSON( $_aisValue ) ? json_decode( $_aisValue, true ) : $_aisValue;
@@ -81,15 +101,15 @@ abstract class TaskScheduler_MetaBox_Base extends TaskScheduler_AdminPageFramewo
             }
             
             $_aModularField = array(
-                'attributes'    =>    array(
-                    'ReadOnly'    =>    'ReadOnly',
-                    'name'        =>    '',
-                    'class'        =>    'read-only',
+                'attributes'    => array(
+                    'ReadOnly'  => 'ReadOnly',
+                    'name'      => '',
+                    'class'     => 'read-only',
                 ),
-                'field_id'    =>    $_aModularField['field_id'],
-                'type'        =>    $this->_getFieldTypeToOnlyDisplay( $_aisValue, $_aModularField['type'] ),
-                'value'        =>    $_aisValue,
-                'title'        =>    $_aModularField['title'],
+                'field_id'      => $_aModularField['field_id'],
+                'type'          => $this->_getFieldTypeToOnlyDisplay( $_aisValue, $_aModularField['type'] ),
+                'value'         => $_aisValue,
+                'title'         => $_aModularField['title'],
                 // 'show_title_column'    =>  true,
             );            
             $_aModularField['attributes']['cols'] = 'textarea' == $_aModularField['type'] ? 42 : null;
@@ -107,31 +127,28 @@ abstract class TaskScheduler_MetaBox_Base extends TaskScheduler_AdminPageFramewo
     }
     
     /**
-     * Returns the 'Change' button field definition array based on the module tab slug.
+     * Returns the module edit link.
+     * @since       1.0.0
      */
-    protected function _getModuleEditButtonField( $sFieldID, $sTabSlug ) {
-
-        $_sModuleEditPageURL = TaskScheduler_PluginUtility::getModuleEditPageURL(
-            array(
-                'transient_key'    =>    TaskScheduler_Registry::TransientPrefix . uniqid(),
-                'tab'            =>    $sTabSlug,
-                'post'            =>    isset( $_GET['post'] ) ? $_GET['post'] : 0,
+    protected function _getChangeButton( $sTabSlug ) {
+        
+        $_sModuleEditPageURL = esc_url(
+            TaskScheduler_PluginUtility::getModuleEditPageURL(
+                array(
+                    'transient_key'  => TaskScheduler_Registry::TRANSIENT_PREFIX . uniqid(),
+                    'tab'            => $sTabSlug,
+                    'post'           => isset( $_GET['post'] )
+                        ? $_GET['post'] 
+                        : 0,
+                )
             )
-        );
-        return array(
-            'field_id'        =>    $sFieldID,
-            'type'            =>    'hidden',
-            'value'            =>    '',
-            'before_field'    =>    "<div style='float:right;'>"
+        );            
+        return "<div style='text-align: right; padding: 0.5em 0 1em;'>"
                 . "<a class='button button-secondary button-large' href='{$_sModuleEditPageURL}'>" 
                     . __( 'Change', 'task-scheduler' ) 
-                    . "</a>"
-                . "</div>",
-            'attributes'    =>    array(
-                'name'        =>    '',
-            ),                
-        );        
-        
+                . "</a>"
+            . "</div>"
+        ;
     }
     
     /**
@@ -150,5 +167,5 @@ abstract class TaskScheduler_MetaBox_Base extends TaskScheduler_AdminPageFramewo
         return 'text';
         
     }    
-
+    
 }
