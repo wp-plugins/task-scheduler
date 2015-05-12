@@ -28,7 +28,11 @@ final class TaskScheduler_Action_PostDeleter_Wizard_2 extends TaskScheduler_Wiza
                     'readonly' => 'readonly',
                     'name'     => '',    // dummy
                 ),
-                'value'             =>    TaskScheduler_WPUtility::getPostTypeLabel( isset( $_aWizardOptions['post_type_of_deleting_posts'] ) ? $_aWizardOptions['post_type_of_deleting_posts'] : null ),
+                'value'             => TaskScheduler_WPUtility::getPostTypeLabel( 
+                    isset( $_aWizardOptions['post_type_of_deleting_posts'] ) 
+                        ? $_aWizardOptions['post_type_of_deleting_posts'] 
+                        : null 
+                ),
             ),            
             array(    
                 'field_id'          => 'post_statuses_of_deleting_posts',
@@ -45,9 +49,14 @@ final class TaskScheduler_Action_PostDeleter_Wizard_2 extends TaskScheduler_Wiza
                 'title'               => __( 'Taxonomy', 'task-scheduler' ),
                 'type'                => 'select',
                 'label'               => array(
-                    -1    => __( 'All Posts', 'task-scheduler' ),
-                )
-                + TaskScheduler_WPUtility::getTaxonomiesByPostTypeSlug( isset( $_aWizardOptions['post_type_of_deleting_posts'] ) ? $_aWizardOptions['post_type_of_deleting_posts'] : null ),
+                        -1    => __( 'All Posts', 'task-scheduler' ),
+                    )
+                    + TaskScheduler_WPUtility::getTaxonomiesByPostTypeSlug( 
+                        isset( $_aWizardOptions['post_type_of_deleting_posts'] )
+                            ? $_aWizardOptions['post_type_of_deleting_posts'] 
+                            : null 
+                    ),
+                'description'   => __( 'Select a taxonomy that deleting posts are associated with.', 'task-scheduler' ),
             ),
         );
         
@@ -73,6 +82,5 @@ final class TaskScheduler_Action_PostDeleter_Wizard_2 extends TaskScheduler_Wiza
         return $aInput;         
 
     }
-    
     
 }
