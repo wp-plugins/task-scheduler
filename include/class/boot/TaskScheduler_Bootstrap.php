@@ -45,7 +45,7 @@ final class TaskScheduler_Bootstrap {
         register_activation_hook( $this->_sFilePath, array( $this, '_replyToCheckRequirements' ) );
         
         // 8. Schedule to load plugin specific components.
-        add_action( 'plugins_loaded', array( $this, '_replyToLoadPluginComponents' ) );
+        add_action( 'after_setup_theme', array( $this, '_replyToLoadPluginComponents' ) );
                         
     }    
     
@@ -182,19 +182,11 @@ final class TaskScheduler_Bootstrap {
     private function _localize() {
         
         load_plugin_textdomain( 
-            TaskScheduler_Registry::TextDomain, 
+            TaskScheduler_Registry::TEXT_DOMAIN, 
             false, 
-            dirname( plugin_basename( $this->_sFilePath ) ) . '/language/'
+            dirname( plugin_basename( $this->_sFilePath ) ) . TaskScheduler_Registry::TEXT_DOMAIN_PATH
         );
-        
-        if ( $this->_bIsAdmin ) {
-            load_plugin_textdomain( 
-                'admin-page-framework', 
-                false, 
-                dirname( plugin_basename( $this->_sFilePath ) ) . '/language/'
-            );        
-        }
-        
+                
     }        
     
     /**

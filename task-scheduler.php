@@ -5,7 +5,7 @@
 	Description:    Provides an enhanced task management system for WordPress.
 	Author:         miunosoft (Michael Uno)
 	Author URI:     http://michaeluno.jp
-	Version:        1.0.1
+	Version:        1.0.2
 */
 
 /**
@@ -15,7 +15,7 @@
  */
 class TaskScheduler_Registry_Base {
 
-	const VERSION        = '1.0.1';    // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
+	const VERSION        = '1.0.2';    // <--- DON'T FORGET TO CHANGE THIS AS WELL!!
 	const NAME           = 'Task Scheduler';
 	const DESCRIPTION    = 'Provides an enhanced task management system for WordPress.';
 	const URI            = 'http://en.michaeluno.jp/';
@@ -34,10 +34,8 @@ final class TaskScheduler_Registry extends TaskScheduler_Registry_Base {
 	        
 	// The plugin itself uses these values.
 	const TRANSIENT_PREFIX          = 'TS_';    // Up to 8 characters as transient name allows 45 characters or less ( 40 for site transients ) so that md5 (32 characters) can be added
-	const TextDomain                = 'task-scheduler';
-	const TextDomainPath            = './language';
-	const RequiredPHPVersion        = '5.2.1';
-	const RequiredWordPressVersion  = '3.7';
+	const TEXT_DOMAIN               = 'task-scheduler';
+	const TEXT_DOMAIN_PATH          = '/language';
         
 	// These properties will be defined in the setUp() method.
 	static public $sFilePath = '';

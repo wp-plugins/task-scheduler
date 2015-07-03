@@ -219,6 +219,10 @@ If you create a module plugin that can be shared by others, submit it to wordpre
 
 == Changelog ==
 
+= 1.0.2 - 2015/07/03 =
+- Fixed auto-complete fields that did not work in WordPress 4.0 or above.
+- Changed the timing of loading plugin components to support themes to add modules.
+
 = 1.0.1 - 2015/05/12 =
 - Fixed a bug in the `Delete Posts` action module that the taxonomy and post status options did not take effect.
 - Fixed an incompatibility issue with WordPress 4.2 or above that in the listing table view, the view links lost the count indications.
