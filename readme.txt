@@ -2,7 +2,7 @@
 Contributors:       Michael Uno, miunosoft
 Donate link:        http://en.michaeluno.jp/donate
 Requires at least:  3.7
-Tested up to:       4.2.2
+Tested up to:       4.2.3
 Stable tag:         1.0.2
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
@@ -21,18 +21,15 @@ Currently, with WP Cron, if you register, for example, 1000 tasks to run immedia
 - triggers tasks registered by the site owner at desired time or interval.
 
 <h4>Built-in Actions</h4>
-- <strong>Delete Posts</strong> - Performs bulk deletion of posts based on the post type, post statuses, taxonomy, and taxonomy terms.
-- <strong>Send Email</strong> - Sends email to specified email addresses.
+- <strong>Delete Posts</strong> - performs bulk deletion of posts based on the post type, post statuses, taxonomy, and taxonomy terms.
+- <strong>Send Email</strong> - sends email to specified email addresses.
+- <strong>Clean Transients</strong> - deletes expired transients (caches).
 
 <h4>Custom Action Modules</h4>
 - <strong>[Auto Post](https://wordpress.org/plugins/auto-post/)</strong> - creates posts automatically.
 
 <h4>Extensible</h4>
 This is designed to be fully extensible and developers can add custom modules including actions and occurrence types.
-
-Some of the possibilities of custom modules include bulk post status change (post expiration), compress files in a certain directory and send it as an email attachment, clean up transients etc. 
-
-If you need a custom module, let us know it!
 
 == Installation ==
 
@@ -218,6 +215,10 @@ If you create a module plugin that can be shared by others, submit it to wordpre
 
 
 == Changelog ==
+
+= 1.1.0 - 2015/08/02 =
+- Added a built-in action module that cleans expired transients.
+- Added an option that enables the ability to remove hung routines.
 
 = 1.0.2 - 2015/07/03 =
 - Fixed auto-complete fields that did not work in WordPress 4.0 or above.
